@@ -3,8 +3,8 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <string.h>
 
-void dostuff(int); /* function prototype */
 void error(char *msg)
 {
     perror(msg);
@@ -46,12 +46,23 @@ int main(int argc, char *argv[])
         printf("Please enter the message: ");
         bzero(buffer,256);
         fgets(buffer,255,stdin);
+        if (strcmp(buffer, "exit") == 0)
+            return 0;
         n = write(newsockfd,buffer,strlen(buffer));
         if (n < 0) 
             error("ERROR writing to socket");
-        bzero(buffer,256);
-        while (read(newsockfd,buffer,255) < 0);
-        printf("%s\n",buffer);
+        bzero(buffer, 256);
+        while (read(newsockfd, buffer, 255) < 0);
+        while (1) {
+            if (strcmp(buffer, "END") == 0)
+                break;
+            printf("%s",buffer);
+            bzero(buffer, 256);
+            if (read(newsockfd, buffer, 255) < 0) {
+                error("ERROR writing to socket");
+                break;
+            }
+        }
     }    
     return 0;
 }

