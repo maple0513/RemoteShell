@@ -1,6 +1,5 @@
-/* A simple server in the internet domain using TCP
-   The port number is passed as an argument */
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -44,11 +43,15 @@ int main(int argc, char *argv[])
     if (newsockfd < 0) 
         error("ERROR on accept");
     while (1) {
+        printf("Please enter the message: ");
+        bzero(buffer,256);
+        fgets(buffer,255,stdin);
+        n = write(newsockfd,buffer,strlen(buffer));
+        if (n < 0) 
+            error("ERROR writing to socket");
         bzero(buffer,256);
         while (read(newsockfd,buffer,255) < 0);
-        printf("Here is the message: %s\n",buffer);
-        n = write(newsockfd,"I got your message",18);
-        if (n < 0) error("ERROR writing to socket");
+        printf("%s\n",buffer);
     }    
     return 0;
 }

