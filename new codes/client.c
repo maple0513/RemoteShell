@@ -60,9 +60,10 @@ int main(int argc, char *argv[])
         if (!file_p) error("ERROR executing command");
         bzero(buffer, 256);
         while (fgets(buffer, 255, file_p) != NULL) {
-        	if (write(sockfd, buffer, 255) < 0)
+            if (write(sockfd, buffer, 255) < 0)
             	error("ERROR writing to socket");
             bzero(buffer, 256);
+	    usleep(1000);
         }
         if (write(sockfd, "END", 255) < 0)
         	error("ERROR writing to socket");
