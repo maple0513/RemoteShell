@@ -106,6 +106,7 @@ int fileOper(int newsockfd, char *buffer) {
 		return 0;
 	inst = strtok(command, " ");
 	fileName = strtok(NULL, " ");
+    fileName = strtok(fileName, "\n");
 	bzero(copyFileName, 256);
 	strcat(copyFileName, "copy_");
 	strcat(copyFileName, fileName);
