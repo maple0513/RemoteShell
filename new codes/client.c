@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
             bzero(buffer, 256);
             if (read(sockfd, buffer, 255) < 0)
                 error("ERROR reading from socket");
-            printf("Here is the file name: %s\n", buffer);
+            printf("Here is the file name: %s", buffer);
             file_p = fopen(strtok(buffer, "\n"), "r");
             printf("%s", buffer);
             sendMessage(file_p, sockfd, buffer);
